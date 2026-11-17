@@ -1,0 +1,26 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+
+# Signing secrets - NEVER commit (keep a private backup outside GitHub)
+dalilak.jks
+*.jks
+*.keystore
+keystore.properties
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+.cxx/
+.externalNativeBuild/
+captures/
+
+# Environment / misc
+.env
+.env.*
+.DS_Store
+Thumbs.db
+*.log
