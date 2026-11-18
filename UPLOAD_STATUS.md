@@ -1,65 +1,57 @@
 # UPLOAD_STATUS.md — دليلك (Dalilak)
 
-## تاريخ ووقت المحاولة
-2026-11-17 — 21:49 (توقيت القاهرة)
-
-## الريبو والـ branch
+## آخر محاولة: رفع النسخة 1.0.1
+- التاريخ والوقت: 2026-11-18 — 04:37 (توقيت القاهرة)
 - الريبو: https://github.com/emyadel8150-cmyk/DALILAK-project
 - الـ branch: `main`
-- الرؤية: **Public** (ملف الحالة بيقول إن المقصود Private، فيه تنبيه تحت)
+- الرؤية: **Public**
 
-## الحالة
+### الحالة
 **Uploaded and verified**
 
 التحقق اللي اتعمل فعلًا:
-- `git ls-remote` رجّع نفس الـ commit المحلي لـ `main`: `5962689`.
-- سحب نسخة جديدة من الريبو: 31 ملف، ومفيش فيها أي ملف مفتاح أو باسورد.
-- خطوة الـ Secrets موجودة في `.github/workflows/build.yml` على الريبو.
+- `git ls-remote` رجّع نفس الـ commit المحلي لـ `main`: `f7a17af`.
+- سحب نسخة جديدة من الريبو: 33 ملف، `versionCode = 2` و`versionName = "1.0.1"`، و`TavilyClient.kt` موجود، والموديل الافتراضي `gemini-3.8-flash`.
+- مفيش أي ملف مفتاح أو باسورد في الريبو.
 
-## الملفات اللي اترفعت (31 ملف)
-- `.github/workflows/build.yml`, `.gitignore`
-- `DALILAK_STATE.md`, `DALILAK_STATE_v1.0.md`, `DALILAK_TODO.md`, `PROJECT_STATUS.md`, `UPLOAD_STATUS.md`
-- `build.gradle.kts`, `settings.gradle.kts`, `gradle.properties`
-- `app/build.gradle.kts`, `app/proguard-rules.pro`, `app/schemas/.gitkeep`, `app/src/main/AndroidManifest.xml`
-- `app/src/main/java/com/casper/dalilak/` (11 ملف Kotlin)
-- `app/src/main/res/` (6 ملفات resources)
+### اللي اترفع في المحاولة دي (12 ملف)
+- جديد: `app/src/main/java/com/casper/dalilak/ai/TavilyClient.kt`, `DALILAK_STATE_v1.0.1.md`
+- معدّل: `GeminiClient.kt`, `AiModels.kt`, `AppSettings.kt`, `AppViewModel.kt`, `Translations.kt`, `ui/Screens.kt`, `app/build.gradle.kts` (الإصدار بس), `DALILAK_STATE.md`, `DALILAK_TODO.md`, `PROJECT_STATUS.md`
 
-## الملفات المستثناة بـ `.gitignore`
-- `dalilak.jks` و`keystore.properties` (مفتاح التوقيع وباسورداته)
-- أنماط عامة: `.gradle/`, `build/`, `local.properties`, `.idea/`, `*.iml`, `*.jks`, `*.keystore`, `*.apk`, `*.aab`, `*.ap_`, `.cxx/`, `.externalNativeBuild/`, `captures/`, `.env`, `.env.*`, `.DS_Store`, `Thumbs.db`, `*.log`
+### اللي ماترفعش عمدًا من الـ zip
+- `dalilak.jks` و`keystore.properties` (مفتاح التوقيع وباسورداته): مستثنيين بـ `.gitignore`.
+- `.gitignore` و`.github/workflows/build.yml` اللي في الـ zip: كانوا **النسخة القديمة** (من غير استثناء المفتاح ومن غير خطوة الـ Secrets)، فسيبت النسختين اللي على الريبو. لو اترفعوا كانوا هيرجّعوا المشكلة ويرفعوا المفتاح على ريبو عام.
+- `UPLOAD_STATUS.md` مش في الـ zip، فاتحدّث على الريبو بدل ما يتمسح.
 
-## نتيجة فحص البيانات الحساسة
-- `dalilak.jks` و`keystore.properties` كانوا في المشروع و`.gitignore` القديم ماكانش بيستثنيهم. اتضافوا للاستثناء، وتأكدت قبل الـ commit وبعد الرفع إنهم مش موجودين في الريبو.
-- مفيش مفاتيح API ولا توكنات مكتوبة في الكود (سكان على الأنماط المعروفة).
+### نتيجة فحص البيانات الحساسة
+- الـ zip كان فيه `dalilak.jks` (نفس مفتاح 1.0 بالظبط) و`keystore.properties`: متستثنيين، وتأكدت قبل الـ commit وبعد الرفع.
+- مفيش مفاتيح API (Gemini/Tavily) ولا توكنات مكتوبة في الكود. مفتاح Tavily بيتحط من الإعدادات في التطبيق ومتخزّن مشفّر على الموبايل.
 - مفيش `local.properties` ولا `.env` ولا `google-services.json` ولا APK/AAB.
 
-## التعديل الوحيد على غير `.gitignore`
-`.github/workflows/build.yml`: اتضافت خطوة "Restore signing key from GitHub Secrets" قبل البناء، بتكتب `dalilak.jks` و`keystore.properties` من الـ Secrets. كود التطبيق و`build.gradle.kts` ماتلمسوش.
-
-## الأوامر اللي اتشغلت فعلًا
+### الأوامر اللي اتشغلت فعلًا
 ```bash
-git init -b main
+unzip Dalilak_v1.0.1.zip            # في فولدرات منفصلة
+git clone https://github.com/emyadel8150-cmyk/DALILAK-project.git
+# نسخ ملفات التطبيق والتوثيق المعدّلة فقط (من غير .gitignore و build.yml والمفتاح)
 git add -A
-git check-ignore -v dalilak.jks keystore.properties
-git commit -m "Initial commit: Dalilak v1.0"
-git remote add origin https://github.com/emyadel8150-cmyk/dalilak-project   # نفس الريبو (الاسم مش حساس للحروف)
-git push -u origin main
+git commit -m "Release 1.0.1: Tavily search with Gemini, graceful fallback"
+git remote set-url origin https://github.com/emyadel8150-cmyk/dalilak-project   # نفس الريبو
+git push origin main
 git ls-remote https://github.com/emyadel8150-cmyk/DALILAK-project.git refs/heads/main
-git clone --depth 1 https://github.com/emyadel8150-cmyk/DALILAK-project.git   # للتحقق
+git clone --depth 1 https://github.com/emyadel8150-cmyk/DALILAK-project.git      # للتحقق
 ```
 
-## مشاكل وإيه اللي فاضل
-1. **لازم تضيف 4 Secrets في الريبو**، وإلا البناء على GitHub Actions هيفشل (أول تشغيل بعد الرفع هيطلع أحمر لحد ما تضيفهم):
-   Settings ← Secrets and variables ← Actions ← New repository secret
-   - `DALILAK_KEYSTORE_BASE64`: محتوى `dalilak.jks` بصيغة base64
-   - `DALILAK_STORE_PASSWORD`: قيمة `storePassword` من `keystore.properties`
-   - `DALILAK_KEY_ALIAS`: `dalilak`
-   - `DALILAK_KEY_PASSWORD`: قيمة `keyPassword` من `keystore.properties`
+### مشاكل وإيه اللي فاضل
+1. الـ workflow بيشتغل لوحده بعد كل push على `main`. ماقدرتش أشوف نتيجته (الـ token بتاع `gh` عندي غير صالح)، فنجاح بناء 1.0.1 مش متأكد منه. حسب ملف الحالة، 1.0.1 ماتبنتش ولا اتجرّبت.
+2. **مفتاح Tavily:** لازم يتعمل من app.tavily.com ويتحط في إعدادات التطبيق. وحسب ملف الحالة، endpoint بتاع Tavily مبني على التوثيق وماتجرّبش فعليًا.
+3. الريبو **Public**: المفتاح مش فيه، بس الكود ظاهر. لو عايزه Private: Settings ← General ← Danger Zone ← Change visibility.
+4. احتفظ بنسخة من `dalilak.jks` و`keystore.properties` بره GitHub. المفتاح ما يتولّدش تاني.
+5. الـ 4 Secrets (`DALILAK_KEYSTORE_BASE64`, `DALILAK_STORE_PASSWORD`, `DALILAK_KEY_ALIAS`, `DALILAK_KEY_PASSWORD`) لازم يفضلوا موجودين في إعدادات الريبو عشان البناء يشتغل.
 
-   لتحويل المفتاح إلى base64 على ويندوز (PowerShell):
-   `[Convert]::ToBase64String([IO.File]::ReadAllBytes("dalilak.jks"))`
-   وعلى لينكس/ماك: `base64 -w0 dalilak.jks`
-2. بعد إضافة الـ Secrets: Actions ← Build Dalilak APK ← Run workflow.
-3. **الريبو Public.** المفتاح مش فيه، بس كود التطبيق ظاهر لأي حد. لو عايزه Private: Settings ← General ← Danger Zone ← Change visibility.
-4. **احتفظ بنسخة من `dalilak.jks` و`keystore.properties` بره GitHub.** المفتاح ما يتولّدش تاني.
-5. حالة الـ workflow ماقدرتش أتحقق منها (الـ token بتاع `gh` عندي غير صالح)، فنتيجة أول بناء لسه مجهولة. وحسب ملف الحالة، التطبيق نفسه ماتبناش ولا اتجرّب لسه.
+---
+
+## المحاولة السابقة: رفع النسخة 1.0
+- التاريخ والوقت: 2026-11-17 — 21:49 (توقيت القاهرة)
+- الحالة: **Uploaded and verified** (commit `5962689` ثم `0c420d5`، 31 ملف)
+- اللي اتعمل: إضافة استثناء المفتاح والباسوردات في `.gitignore`، وإضافة خطوة "Restore signing key from GitHub Secrets" في `build.yml`.
+- الأوامر: `git init -b main` ← `git add -A` ← `git check-ignore -v dalilak.jks keystore.properties` ← `git commit` ← `git remote add origin ...` ← `git push -u origin main` ← `git ls-remote` ← `git clone --depth 1` (للتحقق).
