@@ -11,6 +11,17 @@ object I18n {
     fun t(ar: String): String = if (lang == "en") (EN[ar] ?: ar) else ar
 
     private val EN: Map<String, String> = mapOf(
+        "مفتاح Tavily (البحث على النت)" to "Tavily key (web search)",
+        "الصق مفتاح Tavily هنا" to "Paste the Tavily key here",
+        "مفتاح Tavily اتحفظ مشفّر" to "Tavily key saved (encrypted)",
+        "مفتاح Tavily اتمسح" to "Tavily key deleted",
+        "مفتاح Tavily مش صالح" to "The Tavily key is invalid",
+        "رصيد Tavily خلص" to "Tavily credits are used up",
+        "حصل خطأ في Tavily" to "Tavily error",
+        "رصيد Tavily خلص الشهر ده، فالنتايج من غير بحث وكلها غير مؤكدة" to "Tavily credits are used up this month, so results are without search and all unconfirmed",
+        "البحث ما رجّعش نتايج، فالنتايج من غير بحث وكلها غير مؤكدة" to "The search returned nothing, so results are without search and all unconfirmed",
+        "بحث جوجل مش متاح في الخطة المجانية، فالنتايج من غير بحث وكلها غير مؤكدة. ضيف مفتاح Tavily من الإعدادات." to "Google Search is not available on the free plan, so results are without search and all unconfirmed. Add a Tavily key in Settings.",
+        "Tavily بيدوّر على النت (مجاني 1000 رصيد في الشهر من غير كارت) وGemini بيقرا النتايج. بنبعتله جمل البحث بس." to "Tavily searches the web (free 1000 credits/month, no card) and Gemini reads the results. Only search phrases are sent to it.",
         "آخر عمليات البحث" to "Recent searches",
         "آه" to "Yes",
         "أدوات" to "Tools",

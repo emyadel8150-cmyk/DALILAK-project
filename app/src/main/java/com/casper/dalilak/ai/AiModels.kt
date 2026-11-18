@@ -3,7 +3,8 @@ package com.casper.dalilak.ai
 import org.json.JSONArray
 import org.json.JSONObject
 
-class AiException(message: String) : Exception(message)
+/** code = كود HTTP لو الخطأ من خدمة خارجية، وlimit = الخطأ بسبب حد استخدام/رصيد (بيتعامل معاه بـ fallback). */
+class AiException(message: String, val code: Int = 0, val limit: Boolean = false) : Exception(message)
 
 data class SourceRef(val title: String, val uri: String)
 

@@ -10,7 +10,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-const val DEFAULT_MODEL = "gemini-3.7-flash"
+const val DEFAULT_MODEL = "gemini-3.8-flash"
 const val DEFAULT_STALE_DAYS = 30
 
 /** تشفير مفتاح الـ API بمفتاح AES جوه Android Keystore. المفتاح ما بيطلعش من الجهاز. */
@@ -63,19 +63,31 @@ class AppSettings(ctx: Context) {
         get() = sp.getString("lang", "ar") ?: "ar"
         set(v) { sp.edit().putString("lang", v).apply() }
 
-    fun hasKey(): Boolean = sp.contains("api_key_enc") && sp.contains("api_key_iv")
+    // ---- مفتاح Gemini ----
+    fun hasKey(): Boolean = hasSecret("api_key_enc", "api_key_iv")
+    fun saveKey(plain: String) = saveSecret("api_key_enc", "api_key_iv", plain)
+    fun loadKey(): String? = loadSecret("api_key_enc", "api_key_iv")
+    fun clearKey() = clearSecret("api_key_enc", "api_key_iv")
 
-    fun saveKey(plain: String) {
+    // ---- مفتاح Tavily ----
+    fun hasTavilyKey(): Boolean = hasSecret("tavily_enc", "tavily_iv")
+    fun saveTavilyKey(plain: String) = saveSecret("tavily_enc", "tavily_iv", plain)
+    fun loadTavilyKey(): String? = loadSecret("tavily_enc", "tavily_iv")
+    fun clearTavilyKey() = clearSecret("tavily_enc", "tavily_iv")
+
+    private fun hasSecret(encName: String, ivName: String) = sp.contains(encName) && sp.contains(ivName)
+
+    private fun saveSecret(encName: String, ivName: String, plain: String) {
         val (iv, ct) = KeyCrypto.encrypt(plain.filter { !it.isWhitespace() })
         sp.edit()
-            .putString("api_key_enc", Base64.encodeToString(ct, Base64.NO_WRAP))
-            .putString("api_key_iv", Base64.encodeToString(iv, Base64.NO_WRAP))
+            .putString(encName, Base64.encodeToString(ct, Base64.NO_WRAP))
+            .putString(ivName, Base64.encodeToString(iv, Base64.NO_WRAP))
             .apply()
     }
 
-    fun loadKey(): String? {
-        val enc = sp.getString("api_key_enc", null) ?: return null
-        val iv = sp.getString("api_key_iv", null) ?: return null
+    private fun loadSecret(encName: String, ivName: String): String? {
+        val enc = sp.getString(encName, null) ?: return null
+        val iv = sp.getString(ivName, null) ?: return null
         return try {
             KeyCrypto.decrypt(Base64.decode(iv, Base64.NO_WRAP), Base64.decode(enc, Base64.NO_WRAP))
         } catch (e: Exception) {
@@ -83,7 +95,7 @@ class AppSettings(ctx: Context) {
         }
     }
 
-    fun clearKey() {
-        sp.edit().remove("api_key_enc").remove("api_key_iv").apply()
+    private fun clearSecret(encName: String, ivName: String) {
+        sp.edit().remove(encName).remove(ivName).apply()
     }
 }

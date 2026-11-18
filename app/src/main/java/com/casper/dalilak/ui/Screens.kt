@@ -556,6 +556,7 @@ private fun triLabel(v: Int): String = when (v) {
 fun SettingsScreen(vm: AppViewModel) {
     val ctx = LocalContext.current
     var key by remember { mutableStateOf("") }
+    var tkey by remember { mutableStateOf("") }
     var model by remember { mutableStateOf(vm.model) }
     var stale by remember { mutableStateOf(vm.staleDays.toString()) }
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
@@ -591,6 +592,28 @@ fun SettingsScreen(vm: AppViewModel) {
                 style = MaterialTheme.typography.bodySmall
             )
             HorizontalDivider()
+            Text(tr("مفتاح Tavily (البحث على النت)"), style = MaterialTheme.typography.titleMedium)
+            Text(
+                if (vm.hasTavilyKey) "✓ " + tr("المفتاح محفوظ ومشفّر على الجهاز") else tr("مفيش مفتاح محفوظ"),
+                style = MaterialTheme.typography.bodySmall
+            )
+            OutlinedTextField(
+                value = tkey, onValueChange = { tkey = it },
+                label = { Text(tr("الصق مفتاح Tavily هنا")) },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { vm.saveTavilyKey(tkey); tkey = "" }, enabled = tkey.isNotBlank()) { Text(tr("حفظ المفتاح")) }
+                OutlinedButton(onClick = { vm.clearTavilyKey() }, enabled = vm.hasTavilyKey) { Text(tr("مسح المفتاح")) }
+                TextButton(onClick = { ctx.openUrl("https://app.tavily.com") }) { Text(tr("هات مفتاح")) }
+            }
+            Text(
+                tr("Tavily بيدوّر على النت (مجاني 1000 رصيد في الشهر من غير كارت) وGemini بيقرا النتايج. بنبعتله جمل البحث بس."),
+                style = MaterialTheme.typography.bodySmall
+            )
+            HorizontalDivider()
             OutlinedTextField(
                 value = model, onValueChange = { model = it },
                 label = { Text(tr("اسم الموديل")) },
@@ -619,7 +642,7 @@ fun SettingsScreen(vm: AppViewModel) {
                 OutlinedButton(onClick = { importLauncher.launch(arrayOf("*/*")) }) { Text(tr("استيراد")) }
             }
             vm.info?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
-            Text(tr("دليلك") + " v1.0", style = MaterialTheme.typography.bodySmall)
+            Text(tr("دليلك") + " v1.0.1", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

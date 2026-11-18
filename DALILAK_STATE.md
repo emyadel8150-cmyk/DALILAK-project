@@ -2,7 +2,7 @@
 
 > مرجع لـ Claude: يقراه الأول في أي طلب بدل ما يفحص المشروع من الأول.
 > يتحط في جذر المشروع ويتضاف مع الـ zip.
-> آخر تحديث للملف: النسخة **1.0 (versionCode 1)**
+> آخر تحديث للملف: النسخة **1.0.1 (versionCode 2)**
 
 **دليلك (Websites Discovery Assistant):** تطبيق أندرويد شخصي ذكي. تقوله "أنا عاوز أعمل كذا" فيرشحلك أفضل المواقع والتطبيقات والبرامج وأدوات الـ AI والخدمات، أو Workflow كامل. **تطبيق مستقل خالص ومالوش أي علاقة بالزتونة.**
 
@@ -14,8 +14,8 @@
 | applicationId / namespace | `com.casper.dalilak` (قرار محمد) | تغييره بعد أول نسخة |
 | مفتاح التوقيع | `dalilak.jks` جديد، اتولّد في 1.0 (alias `dalilak`، الباسورد في `keystore.properties`) | مسحه أو تغييره أو إعادة توليده |
 | signingConfigs | مستخدم في debug وrelease | الرجوع لتوقيع debug العشوائي |
-| versionCode | حاليًا 1، و+1 في كل نسخة | ترك الرقم زي ما هو |
-| versionName | حاليًا 1.0، ويزيد مع كل نسخة | — |
+| versionCode | حاليًا 2، و+1 في كل نسخة | ترك الرقم زي ما هو |
+| versionName | حاليًا 1.0.1، ويزيد مع كل نسخة | — |
 | minSdk / targetSdk | minSdk 26 / targetSdk آخر نسخة مدعومة وقت البناء | — |
 
 - أندرويد بيرفض التحديث لو التوقيع أو اسم الحزمة اتغيروا أو versionCode ما زادش.
@@ -28,15 +28,17 @@
 - ممنوع `fallbackToDestructiveMigration`.
 - أي جدول/عمود جديد = ارفع version + اكتب migration + ضيفه في `addMigrations` وفي `@Database` + ضيفه في الباكاب.
 - الأعمدة الجديدة: `ALTER TABLE ... ADD COLUMN ... NOT NULL DEFAULT ...`
-- مفتاح Gemini API: بيدخله محمد في الإعدادات ويتخزن مشفّر على الجهاز، **ممنوع** يتحط في الكود أو الـ zip أو الباكاب.
+- مفاتيح Gemini وTavily: بيدخلهم محمد في الإعدادات ويتخزن مشفّر على الجهاز، **ممنوع** يتحط في الكود أو الـ zip أو الباكاب.
+- اللي بيتبعت لـ Tavily: جمل البحث بس (من المهمة). مفيش تفضيلات ولا أسماء أدوات.
 - اللي بيتبعت للـ AI: نص المهمة + ملخص تفضيلات (ميزانية، أجهزة، خبرة، تفضيل المجاني) + أسماء أدوات اترفضت/نجحت/موجودة في القاعدة. من غير أسباب الرفض ومن غير أي نص حر تاني. **ممنوع** أي بيانات شخصية تانية (المستوى المجاني ممكن جوجل تستخدم محتواه).
 - ما تمسحش بيانات قديمة. لو بتخفي حاجة من الشاشة سيب العمود.
-- SharedPreferences `dalilak_settings`: `model`, `stale_days`, `lang`, `api_key_enc`, `api_key_iv` (المفتاح مشفّر AES-GCM بـ Android Keystore). المفاتيح دي ما تتغيرش أسماؤها.
+- SharedPreferences `dalilak_settings`: `model`, `stale_days`, `lang`, `api_key_enc`, `api_key_iv` (مفتاح Gemini)، `tavily_enc`, `tavily_iv` (مفتاح Tavily). الاتنين مشفّرين AES-GCM بـ Android Keystore. المفاتيح دي ما تتغيرش أسماؤها.
 
 ## 3) الهيكل والستاك
 
 - Kotlin + Jetpack Compose + Room. (مفيش Flutter.)
-- الذكاء: Gemini API (مستوى مجاني) مع Google Search grounding. **لازم نتأكد من الشروط والحدود الحالية قبل البناء.**
+- الذكاء: **Gemini هو المخ** (الموديل الافتراضي `gemini-3.8-flash`، مجاني للنص، وبيتغير من الإعدادات). **البحث على النت: Tavily** (خطة مجانية 1000 رصيد/شهر من غير كارت، البحث العادي = 1 رصيد). بحث جوجل الرسمي (Grounding) **مش متاح في الخطة المجانية** لـ Gemini 3 وأحدث (من صفحة الأسعار الرسمية، نوفمبر 2026)، ومتاح بعد تفعيل الدفع (5000 بحث/شهر مجانًا ثم $14 لكل 1000، وحد يومي 1500).
+- ترتيب الطرق في `GeminiClient.search`: (1) لو في مفتاح Tavily: Gemini يطلّع حتى 3 جمل بحث ← Tavily ← Gemini يقرا النتايج. (2) من غير مفتاح Tavily: بحث جوجل الرسمي. (3) لو الاتنين مش متاحين (خطأ 400/403/429 أو رصيد Tavily خلص): ترشيح من غير بحث وكل المعلومات "غير مؤكدة" والسعر "غير مؤكد".
 - الهيكل:
 
 ```
@@ -50,7 +52,7 @@ app/src/main/java/com/casper/dalilak/
 ```
 
 - الإصدارات: AGP 8.7.3، Kotlin 2.0.21 (+ KSP 2.0.21-1.0.28)، Compose BOM 2024.12.01، Room 2.6.1، Gradle 8.11.1 (من الـ workflow، مفيش gradlew)، compileSdk/targetSdk 35.
-- ملفات 1.0: `MainActivity`, `AppViewModel` (+`Screen`), `Translations` (`I18n` + `tr()`), `ai/` (`GeminiClient`, `AiModels`), `data/` (`Models` Room, `Repository`, `Backup`, `AppSettings`), `ui/` (`Common`, `Screens`).
+- ملفات 1.0: `MainActivity`, `AppViewModel` (+`Screen`), `Translations` (`I18n` + `tr()`), `ai/` (`GeminiClient`, `TavilyClient`, `AiModels`), `data/` (`Models` Room, `Repository`, `Backup`, `AppSettings`), `ui/` (`Common`, `Screens`).
 
 ## 4) الأقسام والشاشات (1.0)
 
@@ -108,5 +110,6 @@ Routes: بدون navigation library، الشاشة الحالية `vm.screen` (H
 
 ## 9) Changelog
 
+- 1.0.1 (versionCode 2): تصليح خطأ "الخطة المجانية خلصت": البحث بقى بـ Tavily + Gemini 3.8 Flash، وfallback من غير بحث (نتايج غير مؤكدة)، وخانة مفتاح Tavily في الإعدادات. الموديل الافتراضي `gemini-3.8-flash`.
 - 1.0 (versionCode 1): النسخة الأولى. بحث Gemini + Google Search، نتايج حتى 5 كروت، تفاصيل، اخترت/رفضت، تفضيلاتي، السجل، الإعدادات، باكاب. (لسه ما اتبنتش ولا اتجرّبت على موبايل.)
 <!-- سطر جديد مع كل نسخة -->

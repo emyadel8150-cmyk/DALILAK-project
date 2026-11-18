@@ -40,6 +40,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     var detailTool by mutableStateOf<AiTool?>(null)
 
     var hasKey by mutableStateOf(settings.hasKey())
+    var hasTavilyKey by mutableStateOf(settings.hasTavilyKey())
     var model by mutableStateOf(settings.model)
     var staleDays by mutableIntStateOf(settings.staleDays)
 
@@ -82,7 +83,8 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             try {
                 val ctx = buildContext()
-                val res = withContext(Dispatchers.IO) { GeminiClient.search(key, settings.model, t, ctx) }
+                val tavily = settings.loadTavilyKey()
+                val res = withContext(Dispatchers.IO) { GeminiClient.search(key, tavily, settings.model, t, ctx) }
                 repo.saveResult(t, res)
                 result = res
                 resultTask = t
@@ -177,6 +179,22 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
         settings.clearKey()
         hasKey = false
         info = tr("المفتاح اتمسح")
+    }
+
+    fun saveTavilyKey(k: String) {
+        try {
+            settings.saveTavilyKey(k)
+            hasTavilyKey = settings.hasTavilyKey()
+            info = tr("مفتاح Tavily اتحفظ مشفّر")
+        } catch (e: Exception) {
+            info = tr("فشل حفظ المفتاح")
+        }
+    }
+
+    fun clearTavilyKey() {
+        settings.clearTavilyKey()
+        hasTavilyKey = false
+        info = tr("مفتاح Tavily اتمسح")
     }
 
     fun saveModel(m: String) {
